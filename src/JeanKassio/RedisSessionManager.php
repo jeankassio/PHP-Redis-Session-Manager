@@ -13,7 +13,7 @@ class RedisSessionManager{
 	private $handler;
 	private $sessionId;
 	
-	public function __construct(string $host, int $port, ?$pass = null){
+	public function __construct(string $host, int $port, ?string $pass = null){
 		
 		$this->prefix = ini_get('session.save_path') ?: 'PHPREDIS_SESSION:';
 		$this->ttl = (int)ini_get("session.gc_maxlifetime");
@@ -31,6 +31,7 @@ class RedisSessionManager{
 	
 	public function start(){
 		
+		session_set_save_handler($this->handler, true);
 		session_start();
 		
 	}
@@ -43,11 +44,13 @@ class RedisSessionManager{
 	
 	public function getSession(): array|false {
 		
-		if(($json = $this->redis->get($this->sessionId)) === false || !is_array($json)){
-			return '';
+		if(($json = $this->redis->get($this->sessionId)) === false){
+			return false;
 		}
 		
-		return json_decode($json, true);
+		$arr = json_decode($json, true);
+		
+		return ((json_last_error() == JSON_ERROR_NONE) ? $arr : false);
 		
 	}
 	
