@@ -77,6 +77,36 @@ $redisSessionManager->delSession();
 
 ```
 
+## PHPUnit
+
+Inside folder:
+```bash
+cd /vendor/jeankassio/php-redis-session-manager
+```
+Edit the file phpunit.xml with your credentials:
+```xml
+    <php>
+        <env name="REDIS_HOST" value="127.0.0.1"/>
+        <env name="REDIS_PORT" value="6379"/>
+        <env name="REDIS_PASS" value="redis_pass"/>
+    </php>
+```
+
+run phpunit:
+```bash
+PHPUnit 10.5.47 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.3.22
+Configuration: /www/wwwroot/----/session/vendor/jeankassio/php-redis-session-manager/phpunit.xml
+
+.....                                                               5 / 5 (100%)
+
+Time: 00:00.038, Memory: 24.94 MB
+
+OK, but there were issues!
+Tests: 5, Assertions: 8, PHPUnit Deprecations: 1.
+```
+
 ## Features
 - Password-protected Redis connection (optional)
 - Lightweight and compatible with PHP-FPM, CLI, and Swoole/WebSocket
