@@ -44,7 +44,7 @@ class RedisSessionManager{
 	
 	public function getSession(): array|false {
 		
-		if(($json = $this->redis->get($this->sessionId)) === false){
+		if(($json = $this->redis->get($this->prefix . $this->sessionId)) === false){
 			return false;
 		}
 		
@@ -62,13 +62,13 @@ class RedisSessionManager{
 		
 		$json = json_encode($data);
 		
-		return $this->redis->setex($this->sessionId, $this->ttl, $json);
+		return $this->redis->setex($this->prefix . $this->sessionId, $this->ttl, $json);
 		
 	}
 	
 	public function delSession(): bool{
 		
-		return (bool)$this->redis->del($this->sessionId);
+		return (bool)$this->redis->del($this->prefix . $this->sessionId);
 		
 	}
 	
