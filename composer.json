@@ -1,0 +1,20 @@
+{
+  "name": "jeankassio/php-redis-session-manager",
+  "description": "Session creation and management with Redis, being able to obtain session data directly with $_SESSION or Redis calls",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jean Kássio",
+      "email": "contato@jeankassio.dev"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "JeanKassio\\": "src/"
+    }
+  }
+}
