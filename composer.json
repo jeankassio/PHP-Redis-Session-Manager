@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "JeanKassio\\": "src/"
+      "JeanKassio\\": "src/JeanKassio/"
     }
   }
 }
