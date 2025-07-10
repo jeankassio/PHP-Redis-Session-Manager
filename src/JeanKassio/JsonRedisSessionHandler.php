@@ -2,6 +2,8 @@
 
 namespace JeanKassio;
 
+use SessionHandlerInterface;
+
 class JsonRedisSessionHandler implements SessionHandlerInterface {
     private $redis;
 
