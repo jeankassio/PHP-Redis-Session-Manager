@@ -7,11 +7,11 @@ use Redis;
 
 class RedisSessionManager{
 	
-	private $prefix;
-	private $ttl;
-	private $redis;
-	private $handler;
-	private $sessionId;
+	private string $prefix;
+	private int $ttl;
+	private Redis $redis;
+	private JsonRedisSessionHandler $handler;
+	private ?string $sessionId = null;
 	
 	public function __construct(string $host, int $port, ?string $pass = null){
 		
@@ -29,14 +29,14 @@ class RedisSessionManager{
 		
 	}
 	
-	public function start(){
+	public function start(): void{
 		
 		session_set_save_handler($this->handler, true);
 		session_start();
 		
 	}
 	
-	public function setSessionId(string $sessionId){
+	public function setSessionId(string $sessionId): void{
 		
 		$this->sessionId = $sessionId;
 		
@@ -50,7 +50,7 @@ class RedisSessionManager{
 		
 		$arr = json_decode($json, true);
 		
-		return ((json_last_error() == JSON_ERROR_NONE) ? $arr : false);
+		return ((json_last_error() == JSON_ERROR_NONE && is_array($arr)) ? $arr : false);
 		
 	}
 	
@@ -69,6 +69,18 @@ class RedisSessionManager{
 	public function delSession(): bool{
 		
 		return (bool)$this->redis->del($this->sessionId);
+		
+	}
+	
+	public function checkRedis(): bool{
+		
+		try{
+			return $this->redis->ping() ? true : false;
+		}catch(\RedisException $e){
+			return false;
+		}catch(Throwable $e){
+			return false;
+		}
 		
 	}
 	
