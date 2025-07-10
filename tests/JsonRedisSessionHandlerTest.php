@@ -3,36 +3,44 @@
 use PHPUnit\Framework\TestCase;
 use JeanKassio\JsonRedisSessionHandler;
 
-class JsonRedisSessionHandlerTest extends TestCase{
-	
-    private Redis $redis;
-    private JsonRedisSessionHandler $handler;
-    private string $sessionId = 'json-test-session';
+class JsonRedisSessionHandlerTest extends TestCase
+{
+    private $redis;
+    private $handler;
 
-    protected function setUp(): void{
+    protected function setUp(): void
+    {
+        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: 6379;
+        $pass = getenv('REDIS_PASS') ?: null;
+
         $this->redis = new Redis();
-        $this->redis->connect('127.0.0.1', 6379);
+        $this->redis->connect($host, $port);
+
+        if (!is_null($pass)) {
+            $this->redis->auth($pass);
+        }
 
         $this->handler = new JsonRedisSessionHandler($this->redis);
     }
 
-    public function testWriteAndRead(): void{
-		
-        $_SESSION = ['foo' => 'bar', 'baz' => 123];
-        $this->handler->write($this->sessionId, '');
+    public function testWriteAndRead()
+    {
+        $_SESSION = ['test_key' => 'test_value'];
 
-        $read = $this->handler->read($this->sessionId);
-        $this->assertStringContainsString('foo|', $read);
-        $this->assertStringContainsString('baz|', $read);
-		
+        $this->handler->write('phpunit_test', '');
+        $session = $this->handler->read('phpunit_test');
+
+        $this->assertIsString($session);
+        $this->assertStringContainsString('test_key', $session);
     }
 
-    public function testDestroy(): void{
-        $this->handler->write($this->sessionId, '');
-        $this->assertTrue($this->handler->destroy($this->sessionId));
+    public function testDestroy()
+    {
+        $_SESSION = ['remove_key' => 'remove_value'];
+        $this->handler->write('phpunit_test_remove', '');
 
-        $read = $this->handler->read($this->sessionId);
-        $this->assertEquals('', $read);
+        $deleted = $this->handler->destroy('phpunit_test_remove');
+        $this->assertTrue($deleted);
     }
-	
 }

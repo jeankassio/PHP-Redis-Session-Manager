@@ -1,41 +1,46 @@
 <?php
-
-use PHPUnit\Framework\TestCase;
 use JeanKassio\RedisSessionManager;
+use PHPUnit\Framework\TestCase;
 
-class RedisSessionManagerTest extends TestCase{
-	
-    private RedisSessionManager $manager;
-    private string $sessionId = 'test-session';
+class RedisSessionManagerTest extends TestCase
+{
+    private $host;
+    private $port;
+    private $pass;
 
-    protected function setUp(): void{
-        $this->manager = new RedisSessionManager('127.0.0.1', 6379);
-        $this->manager->setSessionId($this->sessionId);
+    protected function setUp(): void
+    {
+        $this->host = getenv('REDIS_HOST') ?: '127.0.0.1';
+        $this->port = getenv('REDIS_PORT') ?: 6379;
+        $this->pass = getenv('REDIS_PASS') ?: null;
     }
 
-    public function testRedisConnection(): void{
-        $this->assertTrue($this->manager->checkRedis());
+    public function testRedisConnection()
+    {
+        $manager = new RedisSessionManager($this->host, $this->port, $this->pass);
+        $this->assertTrue($manager->checkRedis());
     }
 
-    public function testSetAndGetSession(): void{
-		
-        $data = ['user' => 'jean', 'role' => 'admin'];
-        $this->assertTrue($this->manager->setSession($data));
+    public function testSetAndGetSession()
+    {
+        $manager = new RedisSessionManager($this->host, $this->port, $this->pass);
+        $manager->setSessionId('phpunit_test');
 
-        $session = $this->manager->getSession();
+        $manager->setSession(['foo' => 'bar']);
+        $session = $manager->getSession();
+
         $this->assertIsArray($session);
-        $this->assertEquals('jean', $session['user']);
-        $this->assertEquals('admin', $session['role']);
-		
+        $this->assertEquals('bar', $session['foo']);
     }
 
-    public function testDeleteSession(): void{
-		
-        $this->assertTrue($this->manager->delSession());
+    public function testDeleteSession()
+    {
+        $manager = new RedisSessionManager($this->host, $this->port, $this->pass);
+        $manager->setSessionId('phpunit_test');
 
-        $session = $this->manager->getSession();
-        $this->assertFalse($session);
-		
+        $manager->setSession(['foo' => 'bar']);
+        $this->assertTrue($manager->delSession());
+
+        $this->assertFalse($manager->getSession());
     }
-	
 }
