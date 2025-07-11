@@ -6,9 +6,11 @@ use SessionHandlerInterface;
 
 class JsonRedisSessionHandler implements SessionHandlerInterface {
     private $redis;
+	private $prefix;
 
-    public function __construct($_redis){
+    public function __construct($_redis, ?string $_prefix = ''){
         $this->redis = $_redis;
+		$this->prefix = $_prefix;
     }
 
     public function open(string $savePath, string $sessionName): bool {
@@ -20,7 +22,7 @@ class JsonRedisSessionHandler implements SessionHandlerInterface {
     }
 
     public function read(string $id): string|false {
-        $json = $this->redis->get($id);
+        $json = $this->redis->get($this->prefix . $id);
         if($json === false){
 			return '';
 		}
@@ -39,12 +41,12 @@ class JsonRedisSessionHandler implements SessionHandlerInterface {
 		
         $json = json_encode($_SESSION);
         $ttl = (int)ini_get("session.gc_maxlifetime");
-        return $this->redis->setex($id, $ttl, $json);
+        return $this->redis->setex($this->prefix . $id, $ttl, $json);
 		
     }
 
     public function destroy(string $id): bool {
-        return (bool)$this->redis->del($id);
+        return (bool)$this->redis->del($this->prefix . $id);
     }
 
     public function gc(int $max_lifetime): int|false {

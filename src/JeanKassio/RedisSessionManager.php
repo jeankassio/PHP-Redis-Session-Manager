@@ -25,7 +25,7 @@ class RedisSessionManager{
 			$this->redis->auth($pass);
 		}
 		
-		$this->handler = new JsonRedisSessionHandler($this->redis);
+		$this->handler = new JsonRedisSessionHandler($this->redis, $this->prefix);
 		
 	}
 	
